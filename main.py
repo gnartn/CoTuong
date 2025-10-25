@@ -526,7 +526,8 @@ def get_opponent_ws(room_id: str, self_ws: WebSocket):
 # ------------------ HTTP routes ------------------
 @app.get("/")
 async def index():
-    return FileResponse("static/client_web.html")
+    return FileResponse("client_web.html")
+
 
 @app.get("/leaderboard")
 async def leaderboard():

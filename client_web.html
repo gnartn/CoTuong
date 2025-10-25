@@ -8,436 +8,98 @@
     /* === CSS BODY === */
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      /* Nền mặc định là ảnh landing page */
       background-image: url('/static/landing_bg.jpg');
       background-size: cover;
       background-position: center center;
-      background-attachment: fixed; /* Giữ nền cố định khi cuộn */
-      background-color: #3d2c1f; /* Màu nền dự phòng */
-      
+      background-attachment: fixed;
+      background-color: #3d2c1f;
       margin: 0;
       padding: 20px;
       color: #e0d6c5;
       font-size: 16px;
-      min-height: 100vh; /* Đảm bảo nền full chiều cao */
-      transition: background-image 0.5s ease-in-out; /* Hiệu ứng chuyển nền */
-      box-sizing: border-box; /* Thêm để padding không làm vỡ layout */
-    }
-    
-    /* === ĐÃ SỬA LỖI Ở ĐÂY === */
-    body.in-lobby {
-      /* Chuyển về nền sảnh chờ/game */
-      background-image: url('/static/Sanhcho.jpg');
-      /* Đảm bảo nền này cũng che phủ và căn giữa */
-      background-size: cover; 
-      background-position: center center; 
-      background-attachment: fixed; 
-    }
-    /* === KẾT THÚC SỬA LỖI === */
-    
-    header { display: none; } 
-    
-    h2, h3 {
-      font-family: 'Noto Serif SC', serif; 
-      color: #8b0000;
-      border-bottom: 1px solid #dcd1bb;
-      padding-bottom: 5px;
-    }
-
-    /* --- Khung (Panel) thống nhất --- */
-    #lobbyView, .right, #modalContent {
-      background: #fdfbf5; 
-      color: #3d2c1f; 
-      border-radius: 12px; 
-      padding: 20px;
-      box-shadow: 0 8px 25px rgba(0,0,0,0.4); 
-      border: 1px solid #dcd1bb; 
-    }
-    
-    /* === GIAO DIỆN LANDING PAGE (LOGIN) === */
-    #loginView {
-      display: flex; 
-      flex-direction: column; 
-      justify-content: center; 
-      align-items: center; 
-      height: 90vh; 
-      max-width: 1100px; 
-      margin: 0 auto; 
-      text-align: center;
-      padding: 20px;
+      min-height: 100vh;
+      transition: background-image 0.5s ease-in-out;
       box-sizing: border-box;
-      background: transparent;
-      border: none;
-      box-shadow: none;
     }
-    
-    #loginView input {
-      font-size: 1.2em;
-      padding: 14px 20px;
-      border-radius: 10px;
-      border: 2px solid #7a4f2b;
-      background: rgba(255, 255, 255, 0.9); 
-      margin-top: 220px; 
-      width: 320px;
-      max-width: 90%;
-      text-align: center;
-      color: #3d2c1f;
-    }
-    #loginView input:focus {
-      border-color: #8b0000;
-      outline: none;
-      box-shadow: 0 0 5px rgba(139,0,0,0.3);
+    body.in-lobby {
+      background-image: url('/static/Sanhcho.jpg');
+      background-size: cover;
+      background-position: center center;
+      background-attachment: fixed;
     }
 
+    header { display: none; }
+    h2, h3 { font-family: 'Noto Serif SC', serif; color: #8b0000; border-bottom: 1px solid #dcd1bb; padding-bottom: 5px; }
+
+    #lobbyView, .right, #modalContent {
+      background: #fdfbf5; color: #3d2c1f;
+      border-radius: 12px; padding: 20px;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.4);
+      border: 1px solid #dcd1bb;
+    }
+
+    #loginView {
+      display: flex; flex-direction: column;
+      justify-content: center; align-items: center;
+      height: 90vh; max-width: 1100px; margin: 0 auto;
+      text-align: center; padding: 20px; background: transparent;
+      border: none; box-shadow: none;
+    }
+    #loginView input {
+      font-size: 1.2em; padding: 14px 20px; border-radius: 10px;
+      border: 2px solid #7a4f2b; background: rgba(255,255,255,0.9);
+      margin-top: 220px; width: 320px; max-width: 90%; text-align: center; color: #3d2c1f;
+    }
     #loginView button {
-      font-family: 'Noto Serif SC', serif;
-      font-size: 1.7em;
-      padding: 14px 45px;
-      background: rgb(134, 18, 18); 
-      color: white;
-      border: 2px solid #ffc;
-      box-shadow: 0 5px 15px rgba(109, 11, 11, 0.4);
-      margin-top: 25px;
-      margin-left: 0; 
-      cursor: pointer;
-      border-radius: 10px;
-      text-transform: uppercase; 
-      font-weight: 700;
+      font-family: 'Noto Serif SC', serif; font-size: 1.7em;
+      padding: 14px 45px; background: rgb(134,18,18); color: white;
+      border: 2px solid #ffc; margin-top: 25px; cursor: pointer;
+      border-radius: 10px; text-transform: uppercase; font-weight: 700;
+      box-shadow: 0 5px 15px rgba(109,11,11,0.4);
     }
-    #loginView button:hover {
-      background: #c00;
-      transform: translateY(-2px);
-    }
-    
+    #loginView button:hover { background: #c00; transform: translateY(-2px); }
+
     #lobbyView { display: none; max-width: 600px; margin: 20px auto; }
     #gameView { display: none; }
 
-    /* --- Bố cục Game View --- */
-    .layout { 
-      display:flex; 
-      gap:20px; 
-      justify-content:center; 
-      margin-top:10px; 
-      flex-wrap: wrap; 
-      /* Thêm để đảm bảo layout không bị ảnh hưởng bởi nền */
-      position: relative; 
-      z-index: 1;
-    }
+    .layout { display:flex; gap:20px; justify-content:center; margin-top:10px; flex-wrap:wrap; position:relative; z-index:1; }
     .left { width: 660px; }
-    .right { 
-      width: 300px; 
-      padding: 16px; 
-      box-sizing: border-box; 
-    }
+    .right { width:300px; padding:16px; box-sizing:border-box; }
 
-    /* --- Button Thống nhất (cho Lobby và Game) --- */
-    button {
-      padding: 10px 16px;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-      font-weight: 600;
-      font-size: 15px;
-      transition: background-color 0.2s, transform 0.1s;
-      font-family: 'Segoe UI', sans-serif;
-    }
-    button:hover {
-      transform: translateY(-1px); 
-    }
-    button:active {
-      transform: translateY(0);
-    }
-    button:disabled {
-      background: #ccc !important; 
-      color: #666;
-      cursor: not-allowed;
-      transform: none;
-    }
+    button { padding:10px 16px; border:none; border-radius:6px; cursor:pointer; font-weight:600; font-size:15px; transition:background-color 0.2s, transform 0.1s; }
+    button:hover { transform:translateY(-1px); }
+    button:disabled { background:#ccc!important; color:#666; cursor:not-allowed; }
 
-    /* Nút chính (Rời phòng, Chơi với Bot) */
-    .controls button, .lobby-controls button {
-      background: #8b0000; 
-      color: white;
-      margin-left: 8px;
-    }
-    .controls button:hover, .lobby-controls button:hover {
-      background: #a52a2a; 
-    }
+    .controls button, .lobby-controls button { background:#8b0000; color:white; margin-left:8px; }
+    .controls button:hover, .lobby-controls button:hover { background:#a52a2a; }
 
-    /* Nút "Thành công" / "Hành động" (Thách đấu, Chấp nhận) */
-    #playerList button, .invitation button:first-of-type, #modalActions button:first-of-type {
-      background: #b8860b; 
-      color: white;
-      padding: 5px 10px; 
-      font-size: 14px;
+    .board {
+      display:grid;
+      grid-template-columns:repeat(9,70px);
+      grid-template-rows:repeat(10,70px);
+      width:630px; height:700px;
+      background-image:url('/static/banco.jpg');
+      background-size:contain;
+      background-repeat:no-repeat;
+      background-position:center;
+      border-radius:10px;
+      border:6px solid #7a4f2b;
+      box-shadow:0 8px 24px rgba(0,0,0,0.25);
+      position:relative; margin:20px auto; justify-content:center; align-content:center;
+      transition:transform 0.5s;
     }
-    #playerList button:hover, .invitation button:first-of-type:hover, #modalActions button:first-of-type:hover {
-      background: #daa520; 
-    }
-
-    /* Nút "Từ chối" / "Phụ" */
-    .invitation button:last-of-type, #modalActions button:last-of-type {
-      background: #aaa;
-      color: #333;
-      padding: 5px 10px;
-      font-size: 14px;
-    }
-    .invitation button:last-of-type:hover, #modalActions button:last-of-type:hover {
-      background: #bbb;
-    }
-
-    /* --- Danh sách Lobby --- */
-    .lobby-controls { margin-bottom: 20px; }
-
-    #playerList { list-style: none; padding: 0; }
-    #playerList li {
-      padding: 12px;
-      background: transparent; 
-      margin-bottom: 8px; 
-      border-radius: 6px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      border: 1px solid #dcd1bb; 
-      transition: background-color 0.2s;
-    }
-    #playerList li:hover {
-      background: #fffbef; 
-    }
-
-    #invitations { margin-top: 20px; }
-    
-    .invitation {
-      padding: 12px 15px;
-      background: #fffbeb; 
-      border: 1px solid #ffe58f; 
-      margin-bottom: 8px;
-      border-radius: 8px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.05); 
-    }
-    .invitation span {
-      font-weight: 500;
-      color: #5c4a1a; 
-    }
-    .invitation button { margin-left: 8px; }
-
-   /* --- Bàn cờ --- */
-.board {
-  display: grid;
-  grid-template-columns: repeat(9, 70px);
-  grid-template-rows: repeat(10, 70px);
-  width: 630px;
-  height: 700px;
-
-  /* Ảnh nền bàn cờ */
-  background-image: url('/static/banco.jpg');
-  background-size: contain;
-  background-repeat: no-repeat;
-  background-position: center;
-
-  border-radius: 10px;
-  border: 6px solid #7a4f2b;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
-
-  position: relative;
-  margin: 20px auto; /* căn giữa theo chiều ngang */
-  justify-content: center;
-  align-content: center;
-  transition: transform 0.5s;
-}
-
     .cell { width:70px; height:70px; display:flex; justify-content:center; align-items:center; cursor:pointer; }
 
-    /* --- Quân cờ --- */
-    .piece {
-      width: 60px; 
-      height: 60px;
-      box-sizing: border-box; 
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      border-radius: 50%;
-      font-family: 'Noto Serif SC', serif;
-      font-weight: 900;
-      font-size: 32px; 
-      user-select: none;
-      transition: all 0.2s ease-out;
-      background: linear-gradient(145deg, #f0e0c0, #d8b888); 
-      border: 5px solid #8b5a2b; 
-      box-shadow:
-        inset 0 2px 2px rgba(255, 255, 255, 0.6), 
-        inset 0 -2px 4px rgba(0, 0, 0, 0.3),
-        0 5px 8px rgba(0, 0, 0, 0.4); 
-    }
-    .piece--red {
-      color: #c00;
-      text-shadow: 1px 1px 1px rgba(0,0,0,0.3);
-    }
-    .piece--black {
-      color: #333;
-      text-shadow: 1px 1px 1px rgba(255,255,255,0.7);
-    }
-    .piece:hover {
-      transform: scale(1.1);
-      box-shadow:
-        inset 0 2px 2px rgba(255, 255, 255, 0.6), 
-        inset 0 -2px 4px rgba(0, 0, 0, 0.3),
-        0 8px 15px rgba(0, 0, 0, 0.5); 
-      cursor: grab; 
-    }
-    .piece.selected {
-      outline: 4px solid #f9d423; 
-      box-shadow: 
-        0 0 25px #f9d423, 
-        inset 0 2px 2px rgba(255, 255, 255, 0.6), 
-        inset 0 -2px 4px rgba(0, 0, 0, 0.3),
-        0 8px 15px rgba(0, 0, 0, 0.5); 
-      transform: scale(1.15); 
-      cursor: grabbing;
-    }
-    
-    /* --- Xoay bàn cờ --- */
-    .board--flipped { transform: rotate(180deg); }
-    .board--flipped .piece { transform: rotate(-180deg); }
-    .board--flipped .piece:hover { transform: rotate(-180deg) scale(1.1); } 
-    .board--flipped .selected { 
-      transform: rotate(-180deg) scale(1.15); 
-      outline: 4px solid #f9d423; 
-      box-shadow: 
-        0 0 25px #f9d423,
-        inset 0 2px 2px rgba(255, 255, 255, 0.6), 
-        inset 0 -2px 4px rgba(0, 0, 0, 0.3),
-        0 8px 15px rgba(0, 0, 0, 0.5); 
-    }
-    
-    /* --- Thông tin game & Log --- */
-    .game-info { text-align:center; }
-    .status {
-      font-size: 1.2em;
-      font-weight: bold;
-      margin-bottom: 8px;
-    }
-    .controls { text-align:center; margin:8px 0; }
+    .piece { width:60px; height:60px; border-radius:50%; font-family:'Noto Serif SC', serif; font-weight:900; font-size:32px; display:flex; justify-content:center; align-items:center;
+      background:linear-gradient(145deg,#f0e0c0,#d8b888); border:5px solid #8b5a2b; }
+    .piece--red { color:#c00; }
+    .piece--black { color:#333; }
 
-    .timer { text-align:center; font-weight:700; font-size:16px; margin:4px 0; }
-    .timer.red { color:#c22; }
-    .timer.black { color:#000; }
-    .timer.active { 
-      font-size: 18px; 
-      text-shadow: 0 0 8px gold; 
-      font-weight: 900;
-    }
-    .thinking { display: none; }
+    .board--flipped { transform:rotate(180deg); }
+    .board--flipped .piece { transform:rotate(-180deg); }
 
-    /* Lịch sử */
-    #log {
-      font-size: 14px;
-      max-height: 300px;
-      overflow-y: auto;
-      background: #fffdf9;
-      border-radius: 6px;
-      padding: 0; 
-      border: 1px solid #dcd1bb;
-    }
-    .log-entry {
-      padding: 8px 12px; 
-      border-bottom: 1px solid #f2eee3; 
-      line-height: 1.4;
-      color: #3d2c1f;
-    }
-    .log-entry:last-child { border-bottom: none; }
-    .log-entry:first-child {
-      background-color: #fff9e0; 
-      font-weight: 500; 
-    }
-    .log-entry span {
-      color: #b8860b; 
-      margin-right: 5px;
-      font-weight: 600;
-    }
-
-    /* Chat */
-    #chatLog {
-      font-size: 14px;
-      max-height: 200px;
-      overflow-y: auto;
-      background: #fffdf9;
-      border-radius: 6px;
-      padding: 10px;
-      border: 1px solid #dcd1bb;
-      margin-bottom: 10px;
-      margin-top: 10px; 
-    }
-    .chat-message {
-      margin-bottom: 5px;
-      line-height: 1.4;
-      word-wrap: break-word; 
-    }
-    .chat-message b {
-      color: #8b0000; 
-    }
-    .chat-input-area {
-      display: flex;
-      gap: 5px;
-    }
-    .chat-input-area input {
-      flex-grow: 1; 
-      padding: 8px 12px;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-      font-size: 14px;
-    }
-    .chat-input-area input:focus {
-      border-color: #8b0000;
-      outline: none;
-    }
-    .chat-input-area button {
-      padding: 8px 14px;
-      font-size: 14px;
-      background: #8b0000;
-      color: white;
-      margin-left: 0; 
-    }
-    .chat-input-area button:hover {
-      background: #a52a2a;
-    }
-
-
-    /* --- Modal: Giao diện chiến thắng --- */
-    #modalOverlay {
-      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0,0,0,0.6); display: none;
-      justify-content: center; align-items: center; z-index: 1000;
-    }
-    #modalContent {
-      text-align: center;
-      width: 400px; 
-    }
-    #modalContent h2 { 
-      margin-top: 0; 
-      font-size: 1.5em;
-    }
-    #modalWinnerName {
-      font-family: 'Noto Serif SC', serif;
-      font-size: 2.8em; 
-      color: #b8860b; 
-      text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
-      margin: 10px 0;
-    }
-    #modalText {
-      font-size: 1.1em;
-      color: #555; 
-      margin-bottom: 25px; 
-    }
-    
-    #modalActions button {
-      margin: 0 10px;
-      padding: 12px 20px; 
-      font-size: 16px;
-    }
+    #modalOverlay { position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); display:none; justify-content:center; align-items:center; z-index:1000; }
+    #modalContent { text-align:center; width:400px; }
   </style>
 </head>
 <body>
@@ -451,7 +113,7 @@
     <h2>Sảnh chờ</h2>
     <p>Chào <b id="lobbyPlayerName"></b>.</p>
     <div class="lobby-controls">
-        <button onclick="challengeBot()">Chơi với máy (Bot)</button>
+      <button onclick="challengeBot()">Chơi với máy (Bot)</button>
     </div>
     <div id="invitations"></div>
     <h3>Người chơi online</h3>
@@ -462,27 +124,24 @@
     <div class="layout">
       <div class="left">
         <div class="game-info">
-            <div class="status" id="status">Đang chờ...</div>
-            <div class="timer red" id="clock_red">🔴 Đỏ: 05:00</div>
-            <div class="timer black" id="clock_black">⚫ Đen: 05:00</div>
-            <div class="controls">
-                <button onclick="leaveGame()">Về Sảnh</button>
-            </div>
+          <div class="status" id="status">Đang chờ...</div>
+          <div class="timer red" id="clock_red">🔴 Đỏ: 05:00</div>
+          <div class="timer black" id="clock_black">⚫ Đen: 05:00</div>
+          <div class="controls">
+            <button onclick="leaveGame()">Về Sảnh</button>
+          </div>
         </div>
-        
         <div class="board" id="board"></div>
       </div>
       <div class="right">
         <h3>Lịch sử / Hệ thống</h3>
         <div id="log"></div>
-
         <h3>Chat</h3>
         <div id="chatLog"></div>
         <div class="chat-input-area">
           <input type="text" id="chatInput" placeholder="Nhập tin nhắn..." />
           <button id="sendChatBtn">Gửi</button>
         </div>
-
       </div>
     </div>
   </div>
@@ -499,11 +158,9 @@
     </div>
   </div>
 
-
 <script>
   let ws = null, playerName = null, myColor = null;
   let clocks = { red: 300, black: 300 }, turn = "red", colors = {};
-
   const boardDiv = document.getElementById("board");
   const modalOverlay = document.getElementById("modalOverlay");
   const modalTitle = document.getElementById("modalTitle");
@@ -513,7 +170,6 @@
   const chatInput = document.getElementById("chatInput");
   const sendChatBtn = document.getElementById("sendChatBtn");
 
-  // Tạo 90 ô cờ (9 cột x 10 hàng)
   for (let i = 0; i < 90; i++) {
     const cell = document.createElement("div");
     cell.className = "cell";
@@ -521,292 +177,199 @@
     boardDiv.appendChild(cell);
   }
 
-  // Gửi tin nhắn khi bấm nút hoặc nhấn Enter
   sendChatBtn.onclick = sendChat;
-  chatInput.addEventListener("keydown", (e) => {
-    if (e.key === "Enter" && !e.shiftKey) {
-      e.preventDefault();
-      sendChat();
-    }
-  });
+  chatInput.addEventListener("keydown", (e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendChat(); } });
 
-  /* --- Giữ kết nối WebSocket để tránh bị văng --- */
   setInterval(() => {
-    if (ws && ws.readyState === WebSocket.OPEN) {
-      ws.send(JSON.stringify({ type: "ping_check", time: Date.now() }));
-      // console.log("Ping giữ kết nối gửi đi");
-    }
-  }, 20000); // gửi ping mỗi 20 giây
+    if (ws && ws.readyState === WebSocket.OPEN) ws.send(JSON.stringify({ type: "ping_check", time: Date.now() }));
+  }, 20000);
 
-    function connect(){
-      playerName=document.getElementById("player").value;
-      if(!playerName){ alert("Vui lòng nhập tên"); return; }
+  setInterval(() => { fetch("/", { method: "GET", cache: "no-cache" }); }, 120000);
 
-      const wsProtocol = window.location.protocol === "https:" ? "wss:" : "ws:";
-      const wsHost = window.location.host;
-      ws=new WebSocket(`${wsProtocol}//${wsHost}/ws`);
-      
-      ws.onopen=()=>{
-        document.body.classList.add('in-lobby');
-        ws.send(JSON.stringify({type:"join_lobby", player:playerName}));
-        document.getElementById("loginView").style.display="none";
-        document.getElementById("lobbyView").style.display="block";
-        document.getElementById("lobbyPlayerName").textContent=playerName;
-      };
+  function connect() {
+    playerName = document.getElementById("player").value;
+    if (!playerName) { alert("Vui lòng nhập tên"); return; }
 
-      ws.onmessage=e=>{
-        const msg=JSON.parse(e.data);
-        switch(msg.type){
-          case "lobby_update": updateLobby(msg.players); break;
-          case "challenge_received": showInvitation(msg.from_player); break;
-          case "game_start":
-            myColor=msg.color;
-            document.getElementById("lobbyView").style.display="none";
-            document.getElementById("gameView").style.display="block";
-            modalOverlay.style.display = "none";
-            boardDiv.classList.toggle("board--flipped", myColor==="black");
-            log(`Trận đấu bắt đầu. Bạn là ${myColor}. Đối thủ: ${msg.opponent}`);
-            chatLogDiv.innerHTML = ""; 
-            addChatMessage("Hệ thống", "Chat đã được kết nối. Chúc bạn chơi vui vẻ!");
-            break;
-          case "new_chat_message":
-            addChatMessage(msg.from, msg.text);
-            break;
-          case "state":
-            updateBoard(msg.state.board);
-            turn=msg.turn;
-            clocks=msg.clocks; 
-            colors=msg.colors;
-            updateTurn(); 
-            updateClocks();
-            break;
-          case "clock_update":
-            clocks = msg.clocks;
-            updateClocks();
-            break;
-          case "game_over":
-            showGameOver(msg.winner_name, msg.reason);
-            break;
-          case "rematch_offered":
-            log(`📣 Đối thủ ${msg.from} muốn chơi lại. Bấm "Chơi lại" để đồng ý.`);
-            break;
-          case "system":
-            log(`ℹ️ ${msg.text}`);
-            break;
-          case "error": 
-            log(`⚠️ Lỗi: ${msg.reason}`); 
-            break;
-        }
-      };
+    const wsProtocol = window.location.protocol === "https:" ? "wss:" : "ws:";
+    const wsHost = window.location.host;
+    ws = new WebSocket(`${wsProtocol}//${wsHost}/ws`);
 
-      ws.onclose = () => {
-        document.body.classList.remove('in-lobby');
-        log("Mất kết nối. Đang thử kết nối lại...");
-        document.getElementById("loginView").style.display = "block";
+    ws.onopen = () => {
+      document.body.classList.add('in-lobby');
+      ws.send(JSON.stringify({ type: "join_lobby", player: playerName }));
+      document.getElementById("loginView").style.display = "none";
+      document.getElementById("lobbyView").style.display = "block";
+      document.getElementById("lobbyPlayerName").textContent = playerName;
+    };
+
+    ws.onmessage = handleMessage;
+    ws.onclose = () => {
+      log("⚠️ Mất kết nối. Thử kết nối lại sau 3 giây...");
+      setTimeout(reconnect, 3000);
+    };
+  }
+
+  function reconnect() {
+    const wsProtocol = window.location.protocol === "https:" ? "wss:" : "ws:";
+    const wsHost = window.location.host;
+    ws = new WebSocket(`${wsProtocol}//${wsHost}/ws`);
+    ws.onopen = () => { ws.send(JSON.stringify({ type: "rejoin", player: playerName })); log("🔄 Đã kết nối lại máy chủ."); };
+    ws.onmessage = handleMessage;
+  }
+
+  function handleMessage(e) {
+    const msg = JSON.parse(e.data);
+    switch (msg.type) {
+      case "lobby_update": updateLobby(msg.players); break;
+      case "challenge_received": showInvitation(msg.from_player); break;
+      case "game_start":
+        myColor = msg.color;
         document.getElementById("lobbyView").style.display = "none";
-        document.getElementById("gameView").style.display = "none";
-      };
+        document.getElementById("gameView").style.display = "block";
+        modalOverlay.style.display = "none";
+        boardDiv.classList.toggle("board--flipped", myColor === "black");
+        log(`Trận đấu bắt đầu. Bạn là ${myColor}. Đối thủ: ${msg.opponent}`);
+        chatLogDiv.innerHTML = "";
+        addChatMessage("Hệ thống", "Chat đã kết nối!");
+        break;
+      case "new_chat_message": addChatMessage(msg.from, msg.text); break;
+      case "state": updateBoard(msg.state.board); turn = msg.turn; clocks = msg.clocks; colors = msg.colors; updateTurn(); updateClocks(); break;
+      case "clock_update": clocks = msg.clocks; updateClocks(); break;
+      case "game_over": showGameOver(msg.winner_name, msg.reason); break;
+      case "rematch_offered": log(`📣 ${msg.from} muốn chơi lại.`); break;
+      case "system": log(`ℹ️ ${msg.text}`); break;
+      case "error": log(`⚠️ ${msg.reason}`); break;
     }
+  }
 
-    function updateLobby(players){
-      const list=document.getElementById("playerList");
-      list.innerHTML="";
-      players.forEach(p=>{
-        if(p===playerName) return;
-        const li=document.createElement("li");
-        li.textContent=p;
-        const b=document.createElement("button");
-        b.textContent="Thách đấu";
-        b.onclick=()=>ws.send(JSON.stringify({type:"challenge", target_player:p}));
-        li.appendChild(b); list.appendChild(li);
-      });
-      if(list.innerHTML==="") list.innerHTML="<li>Không có ai khác.</li>";
-    }
+  function updateLobby(players) {
+    const list = document.getElementById("playerList");
+    list.innerHTML = "";
+    players.forEach(p => {
+      if (p === playerName) return;
+      const li = document.createElement("li");
+      li.textContent = p;
+      const b = document.createElement("button");
+      b.textContent = "Thách đấu";
+      b.onclick = () => ws.send(JSON.stringify({ type: "challenge", target_player: p }));
+      li.appendChild(b);
+      list.appendChild(li);
+    });
+    if (list.innerHTML === "") list.innerHTML = "<li>Không có ai khác.</li>";
+  }
 
-    function challengeBot() {
-      if (ws) {
-        ws.send(JSON.stringify({type: "challenge", target_player: "Bot"}));
-        log("Đã gửi lời mời thách đấu Bot...");
-      }
-    }
+  function challengeBot() { if (ws) ws.send(JSON.stringify({ type: "challenge", target_player: "Bot" })); }
 
-    function showInvitation(from){
-      const inv=document.getElementById("invitations");
-      inv.innerHTML+=`<div class="invitation" id="inv-from-${from}">
+  function showInvitation(from) {
+    const inv = document.getElementById("invitations");
+    inv.innerHTML += `<div class="invitation" id="inv-from-${from}">
       <span>${from} mời bạn thách đấu.</span>
       <div>
         <button onclick="acceptChallenge('${from}')">Chấp nhận</button>
         <button onclick="declineChallenge('${from}')">Từ chối</button>
       </div></div>`;
-    }
-    function acceptChallenge(n){ 
-      ws.send(JSON.stringify({type:"challenge_accept", opponent_name:n})); 
-      document.getElementById("invitations").innerHTML=""; 
-    }
-    function declineChallenge(n){ 
-      ws.send(JSON.stringify({type:"challenge_decline", opponent_name:n})); 
-      const el = document.getElementById(`inv-from-${n}`);
-      if(el) el.remove();
-    }
+  }
 
-    function getPieceColor(p){ return ['俥','傌','相','仕','帥','炮','兵'].includes(p)?'red':'black'; }
+  function acceptChallenge(n) { ws.send(JSON.stringify({ type: "challenge_accept", opponent_name: n })); document.getElementById("invitations").innerHTML = ""; }
+  function declineChallenge(n) { ws.send(JSON.stringify({ type: "challenge_decline", opponent_name: n })); const el = document.getElementById(`inv-from-${n}`); if (el) el.remove(); }
 
-    function updateBoard(b){
-      const cells=document.getElementsByClassName("cell");
-      for(let i=0;i<90;i++){ cells[i].innerHTML=""; }
-      for(let y=0;y<10;y++){
-        for(let x=0;x<9;x++){
-          const p=b[y][x];
-          if(p){
-            const div=document.createElement("div");
-            div.className="piece "+(getPieceColor(p)==='red'?'piece--red':'piece--black');
-            div.textContent=p;
-            
-            let showIdx = y*9+x;
-            if(myColor==="black"){ showIdx = 89 - showIdx; }
-            
-            cells[showIdx].appendChild(div);
-          }
-        }
+  function getPieceColor(p) { return ['俥', '傌', '相', '仕', '帥', '炮', '兵'].includes(p) ? 'red' : 'black'; }
+
+  function updateBoard(b) {
+    const cells = document.getElementsByClassName("cell");
+    for (let i = 0; i < 90; i++) cells[i].innerHTML = "";
+    for (let y = 0; y < 10; y++) for (let x = 0; x < 9; x++) {
+      const p = b[y][x];
+      if (p) {
+        const div = document.createElement("div");
+        div.className = "piece " + (getPieceColor(p) === 'red' ? 'piece--red' : 'piece--black');
+        div.textContent = p;
+        cells[y * 9 + x].appendChild(div);
       }
     }
+  }
 
-    function updateTurn(){
-      const st=document.getElementById("status");
-      const now=turn==="red"?"Đỏ":"Đen";
-      const isMyTurn = myColor === turn;
-      st.textContent= isMyTurn ? `🎯 Lượt của bạn (${now})` : `⏳ Lượt của đối thủ (${now})`;
-      st.style.fontWeight = isMyTurn ? "bold" : "normal";
-      document.getElementById("clock_red").classList.toggle("active", turn==="red");
-      document.getElementById("clock_black").classList.toggle("active", turn==="black");
+  function updateTurn() {
+    const st = document.getElementById("status");
+    const now = turn === "red" ? "Đỏ" : "Đen";
+    const isMyTurn = myColor === turn;
+    st.textContent = isMyTurn ? `🎯 Lượt của bạn (${now})` : `⏳ Lượt của đối thủ (${now})`;
+  }
+
+  function fmt(s) { s = Math.max(0, Math.floor(s)); let m = Math.floor(s / 60), x = s % 60; return `${String(m).padStart(2, "0")}:${String(x).padStart(2, "0")}`; }
+
+  function updateClocks() {
+    document.getElementById("clock_red").textContent = `🔴 Đỏ: ${fmt(clocks.red)}`;
+    document.getElementById("clock_black").textContent = `⚫ Đen: ${fmt(clocks.black)}`;
+  }
+
+  let selected = null;
+  function onCellClick(i) {
+    if (!myColor || turn !== myColor) { if (selected) document.getElementsByClassName("cell")[selected.i].firstChild.classList.remove("selected"); selected = null; return; }
+    const y = Math.floor(i / 9), x = i % 9, cell = document.getElementsByClassName("cell")[i], pieceEl = cell.querySelector('.piece');
+    if (!selected && pieceEl) {
+      const pieceColor = pieceEl.classList.contains('piece--red') ? 'red' : 'black';
+      if (pieceColor !== myColor) return;
+      selected = { x, y, i }; pieceEl.classList.add("selected");
+    } else if (selected) {
+      if (selected.i === i) { cell.firstChild.classList.remove("selected"); selected = null; return; }
+      ws.send(JSON.stringify({ type: "move", move: { from: { x: selected.x, y: selected.y }, to: { x, y } } }));
+      const oldCell = document.getElementsByClassName("cell")[selected.i];
+      if (oldCell && oldCell.firstChild) oldCell.firstChild.classList.remove("selected");
+      selected = null;
     }
+  }
 
-    function fmt(s){s=Math.max(0,Math.floor(s));let m=Math.floor(s/60),x=s%60;return `${String(m).padStart(2,"0")}:${String(x).padStart(2,"0")}`;}
+  function showGameOver(winner_name, reason) {
+    modalOverlay.style.display = "flex";
+    modalTitle.textContent = "Trận đấu kết thúc!";
+    document.getElementById("modalWinnerName").textContent = `${winner_name} Thắng!`;
+    modalText.textContent = `Lý do: ${reason}`;
+    const rematchButton = modalActions.querySelector('button:nth-child(1)');
+    rematchButton.textContent = "Chơi lại"; rematchButton.disabled = false;
+  }
 
-    function updateClocks(){
-      document.getElementById("clock_red").textContent=`🔴 Đỏ: ${fmt(clocks.red)}`;
-      document.getElementById("clock_black").textContent=`⚫ Đen: ${fmt(clocks.black)}`;
-    }
+  function offerRematch() {
+    if (ws) ws.send(JSON.stringify({ type: "offer_rematch" }));
+    log("Đã gửi lời mời chơi lại. Đang chờ đối thủ...");
+    const rematchButton = modalActions.querySelector('button:nth-child(1)');
+    if (rematchButton) { rematchButton.textContent = "Đang chờ..."; rematchButton.disabled = true; }
+  }
 
-    let selected=null;
-    function onCellClick(i){
-      if(!myColor || turn !== myColor) {
-        if (selected) {
-            document.getElementsByClassName("cell")[selected.i].firstChild.classList.remove("selected");
-            selected = null;
-        }
-        return;
-      }
+  function leaveGame() {
+    if (ws) ws.send(JSON.stringify({ type: "leave_game" }));
+    document.getElementById("gameView").style.display = "none";
+    document.getElementById("lobbyView").style.display = "block";
+    modalOverlay.style.display = "none";
+    myColor = null; turn = "red"; selected = null;
+    log("Đã quay về sảnh.");
+  }
 
-      let x,y;
-      if(myColor==="black"){
-        const flipped=89-i; y=Math.floor(flipped/9); x=flipped%9;
-      } else {
-        y=Math.floor(i/9); x=i%9;
-      }
-      
-      const cell=document.getElementsByClassName("cell")[i];
-      const pieceEl = cell.querySelector('.piece');
+  function log(t) {
+    const el = document.getElementById("log");
+    const newEntry = document.createElement("div");
+    newEntry.className = "log-entry";
+    newEntry.innerHTML = `<span>[${new Date().toLocaleTimeString()}]</span> ${t}`;
+    el.prepend(newEntry);
+    while (el.childElementCount > 100) el.lastChild.remove();
+  }
 
-      if(!selected && pieceEl){ 
-        const pieceColor = pieceEl.classList.contains('piece--red') ? 'red' : 'black';
-        if (pieceColor !== myColor) return; 
+  function sendChat() {
+    const text = chatInput.value;
+    if (text.trim() === "" || !ws) return;
+    ws.send(JSON.stringify({ type: "chat_message", text }));
+    chatInput.value = "";
+  }
 
-        selected={x,y,i}; 
-        pieceEl.classList.add("selected");
-      } else if(selected) { 
-        if (selected.i === i) {
-            cell.firstChild.classList.remove("selected");
-            selected = null;
-            return;
-        }
-        ws.send(JSON.stringify({type:"move",move:{from:{x:selected.x,y:selected.y},to:{x,y}}}));
-        
-        const oldCell = document.getElementsByClassName("cell")[selected.i];
-        if (oldCell && oldCell.firstChild) {
-            oldCell.firstChild.classList.remove("selected");
-        }
-        selected=null;
-      }
-    }
-
-    function showGameOver(winner_name, reason) {
-        modalOverlay.style.display = "flex";
-        modalTitle.textContent = "Trận đấu kết thúc!";
-        document.getElementById("modalWinnerName").textContent = `${winner_name} Thắng!`;
-        modalText.textContent = `Lý do: ${reason}`;
-        
-        const rematchButton = modalActions.querySelector('button:nth-child(1)');
-        rematchButton.textContent = "Chơi lại";
-        rematchButton.disabled = false;
-    }
-    
-    function offerRematch() {
-        if(ws) ws.send(JSON.stringify({type: "offer_rematch"}));
-        log("Đã gửi lời mời chơi lại. Đang chờ đối thủ...");
-        const rematchButton = modalActions.querySelector('button:nth-child(1)');
-        if(rematchButton) {
-            rematchButton.textContent = "Đang chờ...";
-            rematchButton.disabled = true;
-        }
-    }
-
-    
-    /* === HÀM ĐÃ SỬA LỖI === */
-    function leaveGame() {
-        // === Sửa lỗi: KHÔNG XÓA class 'in-lobby' khi về sảnh ===
-        // document.body.classList.remove('in-lobby'); // <-- Dòng này đã bị comment/xóa
-        
-        if(ws) ws.send(JSON.stringify({type: "leave_game"}));
-        document.getElementById("gameView").style.display = "none";
-        document.getElementById("lobbyView").style.display = "block"; /* Quay về sảnh */
-        modalOverlay.style.display = "none";
-        myColor = null;
-        turn = "red";
-        selected = null;
-        log("Đã quay về sảnh.");
-    }
-    /* === KẾT THÚC SỬA LỖI === */
-
-
-    /* Hàm log lịch sử */
-    function log(t){
-      const el=document.getElementById("log");
-      const newEntry = document.createElement("div");
-      newEntry.className = "log-entry";
-      newEntry.innerHTML = `<span>[${new Date().toLocaleTimeString()}]</span> ${t}`;
-      el.prepend(newEntry); 
-      
-      while (el.childElementCount > 100) {
-        el.lastChild.remove();
-      }
-    }
-
-    /* Hàm chat */
-    function sendChat() {
-      const text = chatInput.value;
-      if (text.trim() === "" || !ws) return;
-      
-      ws.send(JSON.stringify({
-        type: "chat_message",
-        text: text
-      }));
-      
-      chatInput.value = ""; 
-    }
-
-    function addChatMessage(from, text) {
-      const newEntry = document.createElement("div");
-      newEntry.className = "chat-message";
-      
-      const safeFrom = from.replace(/</g, "&lt;").replace(/>/g, "&gt;");
-      const safeText = text.replace(/</g, "&lt;").replace(/>/g, "&gt;");
-      
-      newEntry.innerHTML = `<b>${safeFrom}:</b> ${safeText}`;
-      chatLogDiv.appendChild(newEntry); 
-      
-      chatLogDiv.scrollTop = chatLogDiv.scrollHeight;
-    }
-  </script>
+  function addChatMessage(from, text) {
+    const newEntry = document.createElement("div");
+    newEntry.className = "chat-message";
+    const safeFrom = from.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    const safeText = text.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    newEntry.innerHTML = `<b>${safeFrom}:</b> ${safeText}`;
+    chatLogDiv.appendChild(newEntry);
+    chatLogDiv.scrollTop = chatLogDiv.scrollHeight;
+  }
+</script>
 </body>
 </html>

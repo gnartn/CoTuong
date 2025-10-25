@@ -537,7 +537,6 @@
       // console.log("Ping giữ kết nối gửi đi");
     }
   }, 20000); // gửi ping mỗi 20 giây
-</script>
 
     function connect(){
       playerName=document.getElementById("player").value;
@@ -745,7 +744,7 @@
     function offerRematch() {
         if(ws) ws.send(JSON.stringify({type: "offer_rematch"}));
         log("Đã gửi lời mời chơi lại. Đang chờ đối thủ...");
-        const rematchButton = modalActions.querySelector('button:nth-gth-child(1)');
+        const rematchButton = modalActions.querySelector('button:nth-child(1)');
         if(rematchButton) {
             rematchButton.textContent = "Đang chờ...";
             rematchButton.disabled = true;

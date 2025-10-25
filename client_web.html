@@ -500,34 +500,44 @@
   </div>
 
 
-  <script>
-    let ws=null, playerName=null, myColor=null;
-    let clocks={red:300, black:300}, turn="red", colors={};
+<script>
+  let ws = null, playerName = null, myColor = null;
+  let clocks = { red: 300, black: 300 }, turn = "red", colors = {};
 
-    const boardDiv=document.getElementById("board");
-    const modalOverlay=document.getElementById("modalOverlay");
-    const modalTitle=document.getElementById("modalTitle");
-    const modalText=document.getElementById("modalText");
-    const modalActions=document.getElementById("modalActions");
+  const boardDiv = document.getElementById("board");
+  const modalOverlay = document.getElementById("modalOverlay");
+  const modalTitle = document.getElementById("modalTitle");
+  const modalText = document.getElementById("modalText");
+  const modalActions = document.getElementById("modalActions");
+  const chatLogDiv = document.getElementById("chatLog");
+  const chatInput = document.getElementById("chatInput");
+  const sendChatBtn = document.getElementById("sendChatBtn");
 
-    const chatLogDiv = document.getElementById("chatLog");
-    const chatInput = document.getElementById("chatInput");
-    const sendChatBtn = document.getElementById("sendChatBtn");
+  // Tạo 90 ô cờ (9 cột x 10 hàng)
+  for (let i = 0; i < 90; i++) {
+    const cell = document.createElement("div");
+    cell.className = "cell";
+    cell.onclick = () => onCellClick(i);
+    boardDiv.appendChild(cell);
+  }
 
-    for(let i=0;i<90;i++){
-      const cell=document.createElement("div");
-      cell.className="cell";
-      cell.onclick=()=>onCellClick(i);
-      boardDiv.appendChild(cell);
+  // Gửi tin nhắn khi bấm nút hoặc nhấn Enter
+  sendChatBtn.onclick = sendChat;
+  chatInput.addEventListener("keydown", (e) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      sendChat();
     }
+  });
 
-    sendChatBtn.onclick = sendChat;
-    chatInput.addEventListener("keydown", (e) => {
-      if (e.key === "Enter" && !e.shiftKey) {
-        e.preventDefault(); 
-        sendChat();
-      }
-    });
+  /* --- Giữ kết nối WebSocket để tránh bị văng --- */
+  setInterval(() => {
+    if (ws && ws.readyState === WebSocket.OPEN) {
+      ws.send(JSON.stringify({ type: "ping_check", time: Date.now() }));
+      // console.log("Ping giữ kết nối gửi đi");
+    }
+  }, 20000); // gửi ping mỗi 20 giây
+</script>
 
     function connect(){
       playerName=document.getElementById("player").value;

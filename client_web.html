@@ -224,23 +224,30 @@
     }
     .invitation button { margin-left: 8px; }
 
-    /* --- Bàn cờ --- */
-    .board {
-      display:grid;
-      grid-template-columns: repeat(9, 70px);
-      grid-template-rows: repeat(10, 70px);
-      width: 640px; 
-height: 710px;
+   /* --- Bàn cờ --- */
+.board {
+  display: grid;
+  grid-template-columns: repeat(9, 70px);
+  grid-template-rows: repeat(10, 70px);
+  width: 630px;
+  height: 700px;
 
-      background-image: url('/static/banco.jpg');
-      background-size: cover;
-      border-radius: 10px; 
-      border: 6px solid #7a4f2b; 
-      box-shadow: 0 8px 24px rgba(0,0,0,0.25); 
-      position: relative;
-      margin: auto;
-      transition: transform 0.5s;
-    }
+  /* Ảnh nền bàn cờ */
+  background-image: url('/static/banco.jpg');
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+
+  border-radius: 10px;
+  border: 6px solid #7a4f2b;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+
+  position: relative;
+  margin: 20px auto; /* căn giữa theo chiều ngang */
+  justify-content: center;
+  align-content: center;
+  transition: transform 0.5s;
+}
 
     .cell { width:70px; height:70px; display:flex; justify-content:center; align-items:center; cursor:pointer; }
 

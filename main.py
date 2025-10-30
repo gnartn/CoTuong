@@ -1,4 +1,4 @@
-# main.py (refactored)
+# main.py (final with absolute paths, client_web.html outside /static)
 from __future__ import annotations
 
 import asyncio
@@ -10,6 +10,7 @@ import time
 import traceback
 import uuid
 from dataclasses import dataclass, field
+from pathlib import Path
 from typing import Dict, List, Optional, Tuple
 
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
@@ -17,12 +18,17 @@ from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 
 # -----------------------------------------------------------------------------
-# App & Static
+# App & Paths
 # -----------------------------------------------------------------------------
 app = FastAPI()
-app.mount("/static", StaticFiles(directory="static"), name="static")
 
-DB_PATH = "games.db"
+BASE_DIR = Path(__file__).resolve().parent
+STATIC_DIR = BASE_DIR / "static"                # thư mục asset tĩnh (ảnh, css, js)
+CLIENT_HTML = BASE_DIR / "client_web.html"      # file HTML nằm ngoài static
+DB_PATH = str(BASE_DIR / "games.db")
+
+# mount static bằng path tuyệt đối để deploy không lỗi
+app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
 
 # -----------------------------------------------------------------------------
 # DB helpers
@@ -130,10 +136,11 @@ def get_opponent_color(color: str) -> str:
 
 def init_board() -> dict:
     board = [["" for _ in range(9)] for _ in range(10)]
+    # Black
     board[0] = ['車', '馬', '象', '士', '將', '士', '象', '馬', '車']
     board[2] = ['', '砲', '', '', '', '', '', '砲', '']
     board[3] = ['卒', '', '卒', '', '卒', '', '卒', '', '卒']
-
+    # Red
     board[9] = ['俥', '傌', '相', '仕', '帥', '仕', '相', '傌', '俥']
     board[7] = ['', '炮', '', '', '', '', '', '炮', '']
     board[6] = ['兵', '', '兵', '', '兵', '', '兵', '', '兵']
@@ -184,7 +191,7 @@ def _is_legal_horse(board: Board, fx: int, fy: int, tx: int, ty: int) -> bool:
         return False
     if dx == 2:  # chặn ngang
         return board[fy][(fx + tx) // 2] == ""
-    else:  # chặn dọc
+    else:       # chặn dọc
         return board[(fy + ty) // 2][fx] == ""
 
 
@@ -218,9 +225,9 @@ def _is_legal_soldier(board: Board, fx: int, fy: int, tx: int, ty: int, color: s
     if dx + dy != 1:
         return False
     if color == 'red':
-        if ty > fy:  # không đi lùi
+        if ty > fy:
             return False
-        if fy >= 5 and tx != fx:  # chưa qua sông không đi ngang
+        if fy >= 5 and tx != fx:
             return False
     else:
         if ty < fy:
@@ -434,7 +441,7 @@ async def timer_loop(room_id: str) -> None:
                     continue
 
                 turn = g.turn
-                # đừng trừ khi tới lượt Bot
+                # không trừ giờ khi tới lượt Bot
                 if "Bot" in g.player_colors and g.player_colors.get("Bot") == turn:
                     continue
 
@@ -511,7 +518,7 @@ async def run_bot_move(room_id: str, bot_color: str) -> None:
             opp = get_opponent_color(bot_color)
             g.turn = opp
 
-            # check king captured
+            # king captured?
             red_alive = find_king(g.state["board"], 'red')[0] != -1
             black_alive = find_king(g.state["board"], 'black')[0] != -1
             if not red_alive or not black_alive:
@@ -519,8 +526,12 @@ async def run_bot_move(room_id: str, bot_color: str) -> None:
                 return
 
         await send_state(room_id)
-        await broadcast_to_room(room_id, {"type": "system", "text": "BOT CHIẾU TƯỚNG!"}
-                                ) if is_king_in_check(rooms[room_id].state["board"], opp) else None
+        # cảnh báo chiếu nếu có
+        try:
+            if is_king_in_check(rooms[room_id].state["board"], opp):
+                await broadcast_to_room(room_id, {"type": "system", "text": "BOT CHIẾU TƯỚNG!"})
+        except Exception:
+            pass
 
     except Exception as e:
         print(f"[BOT] Error: {e}")
@@ -600,7 +611,13 @@ init_db()
 
 @app.get("/")
 async def index():
-    return FileResponse("static/client_web.html")
+    if not CLIENT_HTML.exists():
+        print("❌ Không tìm thấy client_web.html tại:", CLIENT_HTML)
+        return JSONResponse(
+            {"error": "client_web.html not found", "looked_in": str(CLIENT_HTML)},
+            status_code=500
+        )
+    return FileResponse(str(CLIENT_HTML))
 
 @app.get("/leaderboard")
 async def leaderboard():
@@ -823,7 +840,7 @@ async def websocket_endpoint(websocket: WebSocket):
                         await send_game_over(room_id, 'red' if red_alive else 'black', "Tướng đã bị ăn")
                         continue
 
-                    # bot after user's move
+                    # bot sau lượt người
                     names = list(g.player_colors.keys())
                     opponent_name = names[1] if names and names[0] == player else names[0] if names else None
                     if opponent_name == "Bot" and g.game_id and g.turn == g.player_colors["Bot"]:

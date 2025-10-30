@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -138,14 +137,12 @@
   </style>
 </head>
 <body>
-  <!-- LOGIN VIEW -->
   <section id="loginView" aria-labelledby="loginTitle">
     <h1 id="loginTitle" class="sr-only" style="position:absolute;left:-9999px">Cờ Tướng Online</h1>
     <input id="player" autocomplete="nickname" inputmode="latin-name" maxlength="24" placeholder="Tên người chơi" />
     <button id="connectBtn" class="btn-primary" type="button">CHƠI NGAY</button>
   </section>
 
-  <!-- LOBBY VIEW -->
   <section id="lobbyView" aria-labelledby="lobbyTitle">
     <h2 id="lobbyTitle">Sảnh chờ</h2>
     <p>Chào <b id="lobbyPlayerName"></b>.</p>
@@ -157,7 +154,6 @@
     <ul id="playerList"><li>Đang tải...</li></ul>
   </section>
 
-  <!-- GAME VIEW -->
   <section id="gameView" aria-labelledby="gameTitle">
     <h2 id="gameTitle" class="sr-only" style="position:absolute;left:-9999px">Bàn cờ</h2>
     <div class="layout">
@@ -185,7 +181,6 @@
     </div>
   </section>
 
-  <!-- MODAL -->
   <div id="modalOverlay" role="dialog" aria-modal="true" aria-labelledby="modalTitle" aria-describedby="modalText">
     <div id="modalContent">
       <h2 id="modalTitle">Trận đấu kết thúc!</h2>
@@ -314,6 +309,100 @@
         }
       }
     }
+    
+    // =================================================================
+    // ===== BẮT ĐẦU PHẦN CODE ĐÃ SỬA VÀ BỔ SUNG (3 HÀM) =====
+    // =================================================================
+
+    /**
+     * (HÀM ĐƯỢC BỔ SUNG)
+     * Cập nhật đồng hồ
+     */
+    function updateClocks() {
+      els.game.clocks.red.textContent = `🔴 Đỏ: ${fmtTime(clocks.red)}`;
+      els.game.clocks.black.textContent = `⚫ Đen: ${fmtTime(clocks.black)}`;
+      // Làm nổi bật đồng hồ của người đang tới lượt
+      els.game.clocks.red.classList.toggle('active', turn === 'red');
+      els.game.clocks.black.classList.toggle('active', turn === 'black');
+    }
+
+    /**
+     * (HÀM ĐƯỢC BỔ SUNG - SỬA LỖI CỦA BẠN)
+     * Cập nhật trạng thái "Đang chờ..."
+     */
+    function updateTurn() {
+      if (myColor === null) { // Người xem
+        els.game.status.textContent = 'Đang xem...';
+        return;
+      }
+      
+      // Cập nhật văn bản và màu sắc
+      if (turn === myColor) {
+        els.game.status.textContent = 'Lượt của BẠN';
+        els.game.status.style.color = 'var(--accent)'; // Màu đỏ
+      } else {
+        els.game.status.textContent = 'Lượt của Đối thủ';
+        els.game.status.style.color = 'var(--ink)'; // Màu đen
+      }
+    }
+    
+    /**
+     * (HÀM ĐƯỢC BỔ SUNG)
+     * Xử lý khi click vào 1 ô trên bàn cờ
+     */
+    function onCellClick(idx) {
+      // Không cho đi cờ nếu: chưa kết nối, ko có màu (người xem), không phải lượt mình
+      if (!ws || !myColor || myColor !== turn) {
+        selected = null;
+        $$('.selected').forEach(el => el.classList.remove('selected'));
+        return;
+      }
+
+      const cells = $$('.cell', els.game.board);
+      const clickedCell = cells[idx];
+      
+      // Tính toán tọa độ (x, y) thật dựa trên màu quân cờ
+      let realIdx = idx;
+      if (myColor === 'black') {
+        realIdx = 89 - idx; // Lật ngược index nếu là quân đen
+      }
+      const y = Math.floor(realIdx / 9);
+      const x = realIdx % 9;
+      
+      const pieceEl = clickedCell.querySelector('.piece');
+
+      if (selected) {
+        // --- ĐÂY LÀ CLICK THỨ 2 (CHỌN ĐIỂM ĐẾN) ---
+        
+        // Gửi nước đi lên server
+        const move = {
+          from: { x: selected.x, y: selected.y },
+          to: { x: x, y: y }
+        };
+        ws.send(JSON.stringify({ type: 'move', move: move }));
+        
+        // Xóa lựa chọn (highlight)
+        $$('.selected').forEach(el => el.classList.remove('selected'));
+        selected = null;
+
+      } else if (pieceEl) {
+        // --- ĐÂY LÀ CLICK THỨ 1 (CHỌN QUÂN CỜ) ---
+        
+        // Kiểm tra xem có phải quân của mình không
+        const pieceColor = getPieceColor(pieceEl.textContent);
+        if (pieceColor === myColor) {
+          // Highlight quân cờ
+          pieceEl.classList.add('selected');
+          // Lưu lại quân đã chọn
+          selected = { x, y, idx: idx };
+        }
+      }
+    }
+    
+    // =================================================================
+    // ===== KẾT THÚC PHẦN CODE ĐÃ SỬA VÀ BỔ SUNG =====
+    // =================================================================
+
 
     /*** Modal ***/
     function showGameOver(winner_name, reason){
@@ -405,18 +494,38 @@
             showView('game');
             els.modal.overlay.style.display='none';
             els.game.board.classList.toggle('board--flipped', myColor==='black');
-            log(`Trận đấu bắt đầu. Bạn là ${myColor}. Đối thủ: ${msg.opponent}`);
+            
+            // Xóa log và chat cũ
+            els.game.log.innerHTML='';
             els.game.chatLog.innerHTML='';
+            
+            log(`Trận đấu bắt đầu. Bạn là ${myColor}. Đối thủ: ${msg.opponent}`);
             addChatMessage('Hệ thống','Chat đã được kết nối. Chúc bạn chơi vui vẻ!');
+            
+            // Đặt lại trạng thái chờ
+            els.game.status.textContent = 'Đang tải bàn cờ...';
             break;
           case 'new_chat_message':
             addChatMessage(msg.from, msg.text); break;
           case 'state':
             updateBoard(msg.state.board);
-            turn = msg.turn; clocks = msg.clocks; updateTurn(); updateClocks();
+            turn = msg.turn; clocks = msg.clocks; 
+            
+            // ** GỌI CÁC HÀM ĐÃ ĐƯỢC BỔ SUNG **
+            updateTurn(); 
+            updateClocks();
+            
+            // Xóa lựa chọn quân cờ (nếu có) sau khi có trạng thái mới
+            if(selected) {
+                const cells = $$('.cell', els.game.board);
+                if(cells[selected.idx]) cells[selected.idx].querySelector('.piece')?.classList.remove('selected');
+            }
+            selected = null;
             break;
           case 'clock_update':
-            clocks = msg.clocks; updateClocks(); break;
+            clocks = msg.clocks; 
+            updateClocks(); // ** GỌI HÀM ĐÃ BỔ SUNG **
+            break;
           case 'game_over':
             showGameOver(msg.winner_name, msg.reason); break;
           case 'rematch_offered':

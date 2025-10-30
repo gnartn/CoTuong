@@ -1,126 +1,165 @@
+
 <!DOCTYPE html>
 <html lang="vi">
 <head>
   <meta charset="UTF-8" />
-  <title>Cờ Tướng Online</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Cờ Tướng Online – Refactored</title>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@700&display=swap" rel="stylesheet">
   <style>
-    /* === CSS BODY === */
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background-image: url('/static/landing_bg.jpg');
-      background-size: cover;
-      background-position: center center;
-      background-attachment: fixed;
-      background-color: #3d2c1f;
-      margin: 0;
-      padding: 20px;
-      color: #e0d6c5;
-      font-size: 16px;
-      min-height: 100vh;
-      transition: background-image 0.5s ease-in-out;
-      box-sizing: border-box;
+    :root{
+      --bg-brown:#3d2c1f;--accent:#8b0000;--gold:#b8860b;--panel:#fdfbf5;--ink:#3d2c1f;--line:#dcd1bb
     }
-    body.in-lobby {
-      background-image: url('/static/Sanhcho.jpg');
-      background-size: cover;
-      background-position: center center;
-      background-attachment: fixed;
+    *{box-sizing:border-box}
+    body{
+      font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-image:url('/static/landing_bg.jpg');
+      background-size:cover;background-position:center;background-attachment:fixed;
+      background-color:var(--bg-brown);
+      margin:0;padding:20px;color:#e0d6c5;font-size:16px;min-height:100vh;
+      transition:background-image .5s ease-in-out
     }
+    body.in-lobby{background-image:url('/static/Sanhcho.jpg');background-size:cover;background-position:center;background-attachment:fixed}
+    header{display:none}
+    h2,h3{font-family:'Noto Serif SC',serif;color:var(--accent);border-bottom:1px solid var(--line);padding-bottom:5px;margin-top:0}
 
-    header { display: none; }
-    h2, h3 { font-family: 'Noto Serif SC', serif; color: #8b0000; border-bottom: 1px solid #dcd1bb; padding-bottom: 5px; }
+    /* Shared panels */
+    #lobbyView,.right,#modalContent{background:var(--panel);color:var(--ink);border-radius:12px;padding:20px;border:1px solid var(--line);box-shadow:0 8px 25px rgba(0,0,0,.4)}
 
-    #lobbyView, .right, #modalContent {
-      background: #fdfbf5; color: #3d2c1f;
-      border-radius: 12px; padding: 20px;
-      box-shadow: 0 8px 25px rgba(0,0,0,0.4);
-      border: 1px solid #dcd1bb;
-    }
+    /* Login (landing) */
+    #loginView{display:flex;flex-direction:column;justify-content:center;align-items:center;height:90vh;max-width:1100px;margin:0 auto;text-align:center;padding:20px;background:transparent;border:none;box-shadow:none}
+    #player{font-size:1.2em;padding:14px 20px;border-radius:10px;border:2px solid #7a4f2b;background:rgba(255,255,255,.9);margin-top:220px;width:320px;max-width:90%;text-align:center;color:var(--ink)}
+    #player:focus{border-color:var(--accent);outline:none;box-shadow:0 0 5px rgba(139,0,0,.3)}
+    #connectBtn{font-family:'Noto Serif SC',serif;font-size:1.7em;padding:14px 45px;background:rgb(134,18,18);color:#fff;border:2px solid #ffc;box-shadow:0 5px 15px rgba(109,11,11,.4);margin-top:25px;cursor:pointer;border-radius:10px;text-transform:uppercase;font-weight:700}
+    #connectBtn:hover{background:#c00;transform:translateY(-2px)}
 
-    #loginView {
-      display: flex; flex-direction: column;
-      justify-content: center; align-items: center;
-      height: 90vh; max-width: 1100px; margin: 0 auto;
-      text-align: center; padding: 20px; background: transparent;
-      border: none; box-shadow: none;
-    }
-    #loginView input {
-      font-size: 1.2em; padding: 14px 20px; border-radius: 10px;
-      border: 2px solid #7a4f2b; background: rgba(255,255,255,0.9);
-      margin-top: 220px; width: 320px; max-width: 90%; text-align: center; color: #3d2c1f;
-    }
-    #loginView button {
-      font-family: 'Noto Serif SC', serif; font-size: 1.7em;
-      padding: 14px 45px; background: rgb(134,18,18); color: white;
-      border: 2px solid #ffc; margin-top: 25px; cursor: pointer;
-      border-radius: 10px; text-transform: uppercase; font-weight: 700;
-      box-shadow: 0 5px 15px rgba(109,11,11,0.4);
-    }
-    #loginView button:hover { background: #c00; transform: translateY(-2px); }
+    /* Views */
+    #lobbyView{display:none;max-width:600px;margin:20px auto}
+    #gameView{display:none}
 
-    #lobbyView { display: none; max-width: 600px; margin: 20px auto; }
-    #gameView { display: none; }
+    /* Layout */
+    .layout{display:flex;gap:20px;justify-content:center;margin-top:10px;flex-wrap:wrap;position:relative;z-index:1}
+    .left{width:660px}
+    .right{width:300px;padding:16px}
 
-    .layout { display:flex; gap:20px; justify-content:center; margin-top:10px; flex-wrap:wrap; position:relative; z-index:1; }
-    .left { width: 660px; }
-    .right { width:300px; padding:16px; box-sizing:border-box; }
+    /* Buttons */
+    button{padding:10px 16px;border:none;border-radius:6px;cursor:pointer;font-weight:600;font-size:15px;transition:background-color .2s,transform .1s;font-family:'Segoe UI',sans-serif}
+    button:hover{transform:translateY(-1px)}
+    button:active{transform:translateY(0)}
+    button:disabled{background:#ccc!important;color:#666;cursor:not-allowed;transform:none}
 
-    button { padding:10px 16px; border:none; border-radius:6px; cursor:pointer; font-weight:600; font-size:15px; transition:background-color 0.2s, transform 0.1s; }
-    button:hover { transform:translateY(-1px); }
-    button:disabled { background:#ccc!important; color:#666; cursor:not-allowed; }
+    .btn-primary{background:var(--accent);color:#fff}
+    .btn-primary:hover{background:#a52a2a}
+    .btn-action{background:var(--gold);color:#fff;padding:5px 10px;font-size:14px}
+    .btn-action:hover{background:#daa520}
+    .btn-secondary{background:#aaa;color:#333;padding:5px 10px;font-size:14px}
+    .btn-secondary:hover{background:#bbb}
 
-    .controls button, .lobby-controls button { background:#8b0000; color:white; margin-left:8px; }
-    .controls button:hover, .lobby-controls button:hover { background:#a52a2a; }
+    .lobby-controls{margin-bottom:20px}
+    #playerList{list-style:none;padding:0;margin:0}
+    #playerList li{padding:12px;background:transparent;margin-bottom:8px;border-radius:6px;display:flex;justify-content:space-between;align-items:center;border:1px solid var(--line);transition:background-color .2s}
+    #playerList li:hover{background:#fffbef}
 
+    #invitations{margin-top:20px}
+    .invitation{padding:12px 15px;background:#fffbeb;border:1px solid #ffe58f;margin-bottom:8px;border-radius:8px;display:flex;justify-content:space-between;align-items:center;box-shadow:0 2px 4px rgba(0,0,0,.05)}
+    .invitation span{font-weight:500;color:#5c4a1a}
+
+    /* Board */
+    /* BOARD đúng chuẩn CỜ TƯỚNG (ảnh nền) */
     .board {
-      display:grid;
-      grid-template-columns:repeat(9,70px);
-      grid-template-rows:repeat(10,70px);
-      width:630px; height:700px;
-      background-image:url('/static/banco.jpg');
-      background-size:contain;
-      background-repeat:no-repeat;
-      background-position:center;
-      border-radius:10px;
-      border:6px solid #7a4f2b;
-      box-shadow:0 8px 24px rgba(0,0,0,0.25);
-      position:relative; margin:20px auto; justify-content:center; align-content:center;
-      transition:transform 0.5s;
+      width: 630px;
+      height: 700px;
+      position: relative;
+      background-image: url('/static/banco.jpg');
+      background-size: cover;
+      border-radius: 10px;
+      border: 6px solid #7a4f2b;
+      box-shadow: 0 8px 24px rgba(0,0,0,.25);
+      margin: auto;
+      transition: transform .5s;
     }
-    .cell { width:70px; height:70px; display:flex; justify-content:center; align-items:center; cursor:pointer; }
 
-    .piece { width:60px; height:60px; border-radius:50%; font-family:'Noto Serif SC', serif; font-weight:900; font-size:32px; display:flex; justify-content:center; align-items:center;
-      background:linear-gradient(145deg,#f0e0c0,#d8b888); border:5px solid #8b5a2b; }
-    .piece--red { color:#c00; }
-    .piece--black { color:#333; }
+    /* Mỗi giao điểm là một cell tuyệt đối */
+    .cell {
+      width: 70px;
+      height: 70px;
+      position: absolute;
+      left: 0; top: 0;
+      transform: translate(-50%, -50%);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      pointer-events: auto;
+    }
 
-    .board--flipped { transform:rotate(180deg); }
-    .board--flipped .piece { transform:rotate(-180deg); }
+    /* Pieces */
+    .piece{width:60px;height:60px;display:flex;justify-content:center;align-items:center;border-radius:50%;font-family:'Noto Serif SC',serif;font-weight:900;font-size:32px;user-select:none;transition:all .2s ease-out;background:linear-gradient(145deg,#f0e0c0,#d8b888);border:5px solid #8b5a2b;box-shadow:inset 0 2px 2px rgba(255,255,255,.6),inset 0 -2px 4px rgba(0,0,0,.3),0 5px 8px rgba(0,0,0,.4)}
+    .piece--red{color:#c00;text-shadow:1px 1px 1px rgba(0,0,0,.3)}
+    .piece--black{color:#333;text-shadow:1px 1px 1px rgba(255,255,255,.7)}
+    .piece:hover{transform:scale(1.1);box-shadow:inset 0 2px 2px rgba(255,255,255,.6),inset 0 -2px 4px rgba(0,0,0,.3),0 8px 15px rgba(0,0,0,.5);cursor:grab}
+    .piece.selected{outline:4px solid #f9d423;box-shadow:0 0 25px #f9d423,inset 0 2px 2px rgba(255,255,255,.6),inset 0 -2px 4px rgba(0,0,0,.3),0 8px 15px rgba(0,0,0,.5);transform:scale(1.15);cursor:grabbing}
 
-    #modalOverlay { position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); display:none; justify-content:center; align-items:center; z-index:1000; }
-    #modalContent { text-align:center; width:400px; }
+    /* Flip */
+    .board--flipped{transform:rotate(180deg)}
+    .board--flipped .piece{transform:rotate(-180deg)}
+    .board--flipped .piece:hover{transform:rotate(-180deg) scale(1.1)}
+    .board--flipped .selected{transform:rotate(-180deg) scale(1.15);outline:4px solid #f9d423;box-shadow:0 0 25px #f9d423,inset 0 2px 2px rgba(255,255,255,.6),inset 0 -2px 4px rgba(0,0,0,.3),0 8px 15px rgba(0,0,0,.5)}
+
+    /* Info / Log */
+    .game-info{text-align:center}
+    .status{font-size:1.2em;font-weight:bold;margin-bottom:8px}
+    .controls{text-align:center;margin:8px 0}
+    .timer{text-align:center;font-weight:700;font-size:16px;margin:4px 0}
+    .timer.red{color:#c22}
+    .timer.black{color:#000}
+    .timer.active{font-size:18px;text-shadow:0 0 8px gold;font-weight:900}
+
+    #log{font-size:14px;max-height:300px;overflow-y:auto;background:#fffdf9;border-radius:6px;padding:0;border:1px solid var(--line)}
+    .log-entry{padding:8px 12px;border-bottom:1px solid #f2eee3;line-height:1.4;color:var(--ink)}
+    .log-entry:last-child{border-bottom:none}
+    .log-entry span{color:var(--gold);margin-right:5px;font-weight:600}
+
+    /* Chat */
+    #chatLog{font-size:14px;max-height:200px;overflow-y:auto;background:#fffdf9;border-radius:6px;padding:10px;border:1px solid var(--line);margin:10px 0}
+    .chat-message{margin-bottom:5px;line-height:1.4;word-wrap:break-word}
+    .chat-message b{color:var(--accent)}
+    .chat-input-area{display:flex;gap:5px}
+    .chat-input-area input{flex-grow:1;padding:8px 12px;border:1px solid #ccc;border-radius:6px;font-size:14px}
+    .chat-input-area input:focus{border-color:var(--accent);outline:none}
+
+    /* Modal */
+    #modalOverlay{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;justify-content:center;align-items:center;z-index:1000}
+    #modalContent{text-align:center;width:400px}
+    #modalContent h2{margin-top:0;font-size:1.5em}
+    #modalWinnerName{font-family:'Noto Serif SC',serif;font-size:2.8em;color:var(--gold);text-shadow:1px 1px 3px rgba(0,0,0,.5);margin:10px 0}
+    #modalText{font-size:1.1em;color:#555;margin-bottom:25px}
+    #modalActions button{margin:0 10px;padding:12px 20px;font-size:16px}
   </style>
 </head>
 <body>
+  <!-- LOGIN VIEW -->
+  <section id="loginView" aria-labelledby="loginTitle">
+    <h1 id="loginTitle" class="sr-only" style="position:absolute;left:-9999px">Cờ Tướng Online</h1>
+    <input id="player" autocomplete="nickname" inputmode="latin-name" maxlength="24" placeholder="Tên người chơi" />
+    <button id="connectBtn" class="btn-primary" type="button">CHƠI NGAY</button>
+  </section>
 
-  <div id="loginView">
-    <input id="player" value="Player1" placeholder="Tên người chơi" />
-    <button onclick="connect()">CHƠI NGAY</button>
-  </div>
-
-  <div id="lobbyView">
-    <h2>Sảnh chờ</h2>
+  <!-- LOBBY VIEW -->
+  <section id="lobbyView" aria-labelledby="lobbyTitle">
+    <h2 id="lobbyTitle">Sảnh chờ</h2>
     <p>Chào <b id="lobbyPlayerName"></b>.</p>
     <div class="lobby-controls">
-      <button onclick="challengeBot()">Chơi với máy (Bot)</button>
+      <button id="botBtn" class="btn-primary" type="button">Chơi với máy (Bot)</button>
     </div>
-    <div id="invitations"></div>
+    <div id="invitations" aria-live="polite"></div>
     <h3>Người chơi online</h3>
     <ul id="playerList"><li>Đang tải...</li></ul>
-  </div>
+  </section>
 
-  <div id="gameView">
+  <!-- GAME VIEW -->
+  <section id="gameView" aria-labelledby="gameTitle">
+    <h2 id="gameTitle" class="sr-only" style="position:absolute;left:-9999px">Bàn cờ</h2>
     <div class="layout">
       <div class="left">
         <div class="game-info">
@@ -128,248 +167,305 @@
           <div class="timer red" id="clock_red">🔴 Đỏ: 05:00</div>
           <div class="timer black" id="clock_black">⚫ Đen: 05:00</div>
           <div class="controls">
-            <button onclick="leaveGame()">Về Sảnh</button>
+            <button id="backBtn" class="btn-primary" type="button">Về Sảnh</button>
           </div>
         </div>
-        <div class="board" id="board"></div>
+        <div class="board" id="board" role="grid" aria-label="Bàn cờ Cờ Tướng"></div>
       </div>
-      <div class="right">
+      <aside class="right">
         <h3>Lịch sử / Hệ thống</h3>
-        <div id="log"></div>
+        <div id="log" aria-live="polite"></div>
         <h3>Chat</h3>
         <div id="chatLog"></div>
         <div class="chat-input-area">
-          <input type="text" id="chatInput" placeholder="Nhập tin nhắn..." />
-          <button id="sendChatBtn">Gửi</button>
+          <input type="text" id="chatInput" placeholder="Nhập tin nhắn..." maxlength="300" />
+          <button id="sendChatBtn" class="btn-primary" type="button">Gửi</button>
         </div>
-      </div>
+      </aside>
     </div>
-  </div>
+  </section>
 
-  <div id="modalOverlay">
+  <!-- MODAL -->
+  <div id="modalOverlay" role="dialog" aria-modal="true" aria-labelledby="modalTitle" aria-describedby="modalText">
     <div id="modalContent">
       <h2 id="modalTitle">Trận đấu kết thúc!</h2>
       <h1 id="modalWinnerName">Player1 Thắng!</h1>
       <p id="modalText">Lý do: Tướng đã bị ăn</p>
       <div id="modalActions">
-        <button onclick="offerRematch()">Chơi lại</button>
-        <button onclick="leaveGame()">Về Sảnh</button>
+        <button id="rematchBtn" class="btn-action" type="button">Chơi lại</button>
+        <button id="modalBackBtn" class="btn-secondary" type="button">Về Sảnh</button>
       </div>
     </div>
   </div>
 
-<script>
-  let ws = null, playerName = null, myColor = null;
-  let clocks = { red: 300, black: 300 }, turn = "red", colors = {};
-  const boardDiv = document.getElementById("board");
-  const modalOverlay = document.getElementById("modalOverlay");
-  const modalTitle = document.getElementById("modalTitle");
-  const modalText = document.getElementById("modalText");
-  const modalActions = document.getElementById("modalActions");
-  const chatLogDiv = document.getElementById("chatLog");
-  const chatInput = document.getElementById("chatInput");
-  const sendChatBtn = document.getElementById("sendChatBtn");
+  <script>
+  (function(){
+    'use strict';
+    /*** DOM helpers ***/
+    const $ = (sel, ctx=document) => ctx.querySelector(sel);
+    const $$ = (sel, ctx=document) => Array.from(ctx.querySelectorAll(sel));
 
-  for (let i = 0; i < 90; i++) {
-    const cell = document.createElement("div");
-    cell.className = "cell";
-    cell.onclick = () => onCellClick(i);
-    boardDiv.appendChild(cell);
-  }
-
-  sendChatBtn.onclick = sendChat;
-  chatInput.addEventListener("keydown", (e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendChat(); } });
-
-  setInterval(() => {
-    if (ws && ws.readyState === WebSocket.OPEN) ws.send(JSON.stringify({ type: "ping_check", time: Date.now() }));
-  }, 20000);
-
-  setInterval(() => { fetch("/", { method: "GET", cache: "no-cache" }); }, 120000);
-
-  function connect() {
-    playerName = document.getElementById("player").value;
-    if (!playerName) { alert("Vui lòng nhập tên"); return; }
-
-    const wsProtocol = window.location.protocol === "https:" ? "wss:" : "ws:";
-    const wsHost = window.location.host;
-    ws = new WebSocket(`${wsProtocol}//${wsHost}/ws`);
-
-    ws.onopen = () => {
-      document.body.classList.add('in-lobby');
-      ws.send(JSON.stringify({ type: "join_lobby", player: playerName }));
-      document.getElementById("loginView").style.display = "none";
-      document.getElementById("lobbyView").style.display = "block";
-      document.getElementById("lobbyPlayerName").textContent = playerName;
+    /*** Elements ***/
+    const els = {
+      body: document.body,
+      views: { login: $('#loginView'), lobby: $('#lobbyView'), game: $('#gameView') },
+      login: { name: $('#player'), connect: $('#connectBtn') },
+      lobby: { name: $('#lobbyPlayerName'), players: $('#playerList'), invites: $('#invitations'), bot: $('#botBtn') },
+      game: {
+        board: $('#board'), status: $('#status'), clocks: { red: $('#clock_red'), black: $('#clock_black') },
+        back: $('#backBtn'), log: $('#log'), chatLog: $('#chatLog'), chatInput: $('#chatInput'), sendChat: $('#sendChatBtn')
+      },
+      modal: { overlay: $('#modalOverlay'), title: $('#modalTitle'), winner: $('#modalWinnerName'), text: $('#modalText'), actions: $('#modalActions'), rematch: $('#rematchBtn'), back: $('#modalBackBtn') }
     };
 
-    ws.onmessage = handleMessage;
-    ws.onclose = () => {
-      log("⚠️ Mất kết nối. Thử kết nối lại sau 3 giây...");
-      setTimeout(reconnect, 3000);
-    };
-  }
+    /*** State ***/
+    let ws = null;
+    let playerName = null;
+    let myColor = null;    // 'red' | 'black' | null
+    let turn = 'red';
+    let clocks = { red: 300, black: 300 };
+    let selected = null;   // {x,y,i} | null
 
-  function reconnect() {
-    const wsProtocol = window.location.protocol === "https:" ? "wss:" : "ws:";
-    const wsHost = window.location.host;
-    ws = new WebSocket(`${wsProtocol}//${wsHost}/ws`);
-    ws.onopen = () => { ws.send(JSON.stringify({ type: "rejoin", player: playerName })); log("🔄 Đã kết nối lại máy chủ."); };
-    ws.onmessage = handleMessage;
-  }
+    /*** Constants ***/
+    const RED_SET = new Set(['俥','傌','相','仕','帥','炮','兵']);
 
-  function handleMessage(e) {
-    const msg = JSON.parse(e.data);
-    switch (msg.type) {
-      case "lobby_update": updateLobby(msg.players); break;
-      case "challenge_received": showInvitation(msg.from_player); break;
-      case "game_start":
-        myColor = msg.color;
-        document.getElementById("lobbyView").style.display = "none";
-        document.getElementById("gameView").style.display = "block";
-        modalOverlay.style.display = "none";
-        boardDiv.classList.toggle("board--flipped", myColor === "black");
-        log(`Trận đấu bắt đầu. Bạn là ${myColor}. Đối thủ: ${msg.opponent}`);
-        chatLogDiv.innerHTML = "";
-        addChatMessage("Hệ thống", "Chat đã kết nối!");
-        break;
-      case "new_chat_message": addChatMessage(msg.from, msg.text); break;
-      case "state": updateBoard(msg.state.board); turn = msg.turn; clocks = msg.clocks; colors = msg.colors; updateTurn(); updateClocks(); break;
-      case "clock_update": clocks = msg.clocks; updateClocks(); break;
-      case "game_over": showGameOver(msg.winner_name, msg.reason); break;
-      case "rematch_offered": log(`📣 ${msg.from} muốn chơi lại.`); break;
-      case "system": log(`ℹ️ ${msg.text}`); break;
-      case "error": log(`⚠️ ${msg.reason}`); break;
+    /*** View switching ***/
+    function showView(view){
+      const {login,lobby,game} = els.views;
+      login.style.display = view==='login'?'flex':'none';
+      lobby.style.display = view==='lobby'?'block':'none';
+      game.style.display  = view==='game' ?'block':'none';
+      els.body.classList.toggle('in-lobby', view !== 'login');
     }
-  }
 
-  function updateLobby(players) {
-    const list = document.getElementById("playerList");
-    list.innerHTML = "";
-    players.forEach(p => {
-      if (p === playerName) return;
-      const li = document.createElement("li");
-      li.textContent = p;
-      const b = document.createElement("button");
-      b.textContent = "Thách đấu";
-      b.onclick = () => ws.send(JSON.stringify({ type: "challenge", target_player: p }));
-      li.appendChild(b);
-      list.appendChild(li);
-    });
-    if (list.innerHTML === "") list.innerHTML = "<li>Không có ai khác.</li>";
-  }
+    /*** Formatting ***/
+    const fmtTime = (s)=>{s=Math.max(0,Math.floor(s));const m=Math.floor(s/60),x=s%60;return `${String(m).padStart(2,'0')}:${String(x).padStart(2,'0')}`};
 
-  function challengeBot() { if (ws) ws.send(JSON.stringify({ type: "challenge", target_player: "Bot" })); }
+    /*** Logging ***/
+    function log(t){
+      const entry = document.createElement('div');
+      entry.className = 'log-entry';
+      entry.innerHTML = `<span>[${new Date().toLocaleTimeString()}]</span> ${t}`;
+      els.game.log.prepend(entry);
+      while(els.game.log.childElementCount>100) els.game.log.lastChild.remove();
+    }
 
-  function showInvitation(from) {
-    const inv = document.getElementById("invitations");
-    inv.innerHTML += `<div class="invitation" id="inv-from-${from}">
-      <span>${from} mời bạn thách đấu.</span>
-      <div>
-        <button onclick="acceptChallenge('${from}')">Chấp nhận</button>
-        <button onclick="declineChallenge('${from}')">Từ chối</button>
-      </div></div>`;
-  }
+    /*** Chat ***/
+    function sanitize(text){ return String(text).replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+    function addChatMessage(from, text){
+      const row = document.createElement('div');
+      row.className = 'chat-message';
+      row.innerHTML = `<b>${sanitize(from)}:</b> ${sanitize(text)}`;
+      els.game.chatLog.appendChild(row);
+      els.game.chatLog.scrollTop = els.game.chatLog.scrollHeight;
+    }
+    function sendChat(){
+      const text = els.game.chatInput.value.trim();
+      if(!text || !ws) return;
+      ws.send(JSON.stringify({ type:'chat_message', text }));
+      els.game.chatInput.value = '';
+    }
 
-  function acceptChallenge(n) { ws.send(JSON.stringify({ type: "challenge_accept", opponent_name: n })); document.getElementById("invitations").innerHTML = ""; }
-  function declineChallenge(n) { ws.send(JSON.stringify({ type: "challenge_decline", opponent_name: n })); const el = document.getElementById(`inv-from-${n}`); if (el) el.remove(); }
+    /*** Board ***/
+    // Ảnh nền đã căn 630x700. Hộp lưới (khung trong) cần đặt theo pixel thực tế của ảnh
+    const GRID_BOX = { L: 44, R: 44, T: 42, B: 54 };
 
-  function getPieceColor(p) { return ['俥', '傌', '相', '仕', '帥', '炮', '兵'].includes(p) ? 'red' : 'black'; }
+    function createBoard() {
+      els.game.board.innerHTML = '';
+      // Lấy kích thước thực của phần tử board
+      const rect = els.game.board.getBoundingClientRect();
+      const boardW = rect.width || 630;
+      const boardH = rect.height || 700;
+      const innerW = boardW - GRID_BOX.L - GRID_BOX.R;
+      const innerH = boardH - GRID_BOX.T - GRID_BOX.B;
 
-  function updateBoard(b) {
-    const cells = document.getElementsByClassName("cell");
-    for (let i = 0; i < 90; i++) cells[i].innerHTML = "";
-    for (let y = 0; y < 10; y++) for (let x = 0; x < 9; x++) {
-      const p = b[y][x];
-      if (p) {
-        const div = document.createElement("div");
-        div.className = "piece " + (getPieceColor(p) === 'red' ? 'piece--red' : 'piece--black');
-        div.textContent = p;
-        cells[y * 9 + x].appendChild(div);
+      let idx = 0;
+      for (let y = 0; y < 10; y++) {
+        for (let x = 0; x < 9; x++) {
+          const cell = document.createElement('div');
+          cell.className = 'cell';
+          // Tọa độ tâm giao điểm theo pixel
+          const px = GRID_BOX.L + innerW * (x / 8);
+          const py = GRID_BOX.T + innerH * (y / 9);
+          cell.style.left = px + 'px';
+          cell.style.top  = py + 'px';
+          cell.addEventListener('click', () => onCellClick(idx));
+          els.game.board.appendChild(cell);
+          idx++;
+        }
       }
     }
-  }
 
-  function updateTurn() {
-    const st = document.getElementById("status");
-    const now = turn === "red" ? "Đỏ" : "Đen";
-    const isMyTurn = myColor === turn;
-    st.textContent = isMyTurn ? `🎯 Lượt của bạn (${now})` : `⏳ Lượt của đối thủ (${now})`;
-  }
+    function getPieceColor(p){ return RED_SET.has(p) ? 'red' : 'black'; }
 
-  function fmt(s) { s = Math.max(0, Math.floor(s)); let m = Math.floor(s / 60), x = s % 60; return `${String(m).padStart(2, "0")}:${String(x).padStart(2, "0")}`; }
-
-  function updateClocks() {
-    document.getElementById("clock_red").textContent = `🔴 Đỏ: ${fmt(clocks.red)}`;
-    document.getElementById("clock_black").textContent = `⚫ Đen: ${fmt(clocks.black)}`;
-  }
-
-  let selected = null;
-  function onCellClick(i) {
-    if (!myColor || turn !== myColor) { if (selected) document.getElementsByClassName("cell")[selected.i].firstChild.classList.remove("selected"); selected = null; return; }
-    const y = Math.floor(i / 9), x = i % 9, cell = document.getElementsByClassName("cell")[i], pieceEl = cell.querySelector('.piece');
-    if (!selected && pieceEl) {
-      const pieceColor = pieceEl.classList.contains('piece--red') ? 'red' : 'black';
-      if (pieceColor !== myColor) return;
-      selected = { x, y, i }; pieceEl.classList.add("selected");
-    } else if (selected) {
-      if (selected.i === i) { cell.firstChild.classList.remove("selected"); selected = null; return; }
-      ws.send(JSON.stringify({ type: "move", move: { from: { x: selected.x, y: selected.y }, to: { x, y } } }));
-      const oldCell = document.getElementsByClassName("cell")[selected.i];
-      if (oldCell && oldCell.firstChild) oldCell.firstChild.classList.remove("selected");
-      selected = null;
+    function updateBoard(board) {
+      const cells = $$('.cell', els.game.board);
+      cells.forEach(c => c.innerHTML = '');
+      for (let y = 0; y < 10; y++) {
+        for (let x = 0; x < 9; x++) {
+          const p = board[y][x];
+          if (!p) continue;
+          const div = document.createElement('div');
+          div.className = 'piece ' + (getPieceColor(p) === 'red' ? 'piece--red' : 'piece--black');
+          div.textContent = p;
+          let showIdx = y * 9 + x;
+          if (myColor === 'black') showIdx = 89 - showIdx;
+          cells[showIdx].appendChild(div);
+        }
+      }
     }
-  }
 
-  function showGameOver(winner_name, reason) {
-    modalOverlay.style.display = "flex";
-    modalTitle.textContent = "Trận đấu kết thúc!";
-    document.getElementById("modalWinnerName").textContent = `${winner_name} Thắng!`;
-    modalText.textContent = `Lý do: ${reason}`;
-    const rematchButton = modalActions.querySelector('button:nth-child(1)');
-    rematchButton.textContent = "Chơi lại"; rematchButton.disabled = false;
-  }
+    /*** Modal ***/
+    function showGameOver(winner_name, reason){
+      els.modal.overlay.style.display = 'flex';
+      els.modal.title.textContent = 'Trận đấu kết thúc!';
+      els.modal.winner.textContent = `${winner_name} Thắng!`;
+      els.modal.text.textContent = `Lý do: ${reason}`;
+      els.modal.rematch.textContent = 'Chơi lại';
+      els.modal.rematch.disabled = false;
+    }
+    function offerRematch(){
+      if(ws) ws.send(JSON.stringify({ type:'offer_rematch' }));
+      log('Đã gửi lời mời chơi lại. Đang chờ đối thủ...');
+      els.modal.rematch.textContent = 'Đang chờ...';
+      els.modal.rematch.disabled = true;
+    }
 
-  function offerRematch() {
-    if (ws) ws.send(JSON.stringify({ type: "offer_rematch" }));
-    log("Đã gửi lời mời chơi lại. Đang chờ đối thủ...");
-    const rematchButton = modalActions.querySelector('button:nth-child(1)');
-    if (rematchButton) { rematchButton.textContent = "Đang chờ..."; rematchButton.disabled = true; }
-  }
+    /*** Lobby ***/
+    function renderLobby(players){
+      els.lobby.players.innerHTML='';
+      players.forEach(p=>{
+        if(p===playerName) return;
+        const li=document.createElement('li');
+        li.textContent=p;
+        const b=document.createElement('button');
+        b.className='btn-action';
+        b.textContent='Thách đấu';
+        b.addEventListener('click',()=>ws?.send(JSON.stringify({type:'challenge', target_player:p})));
+        li.appendChild(b);
+        els.lobby.players.appendChild(li);
+      });
+      if(!els.lobby.players.childElementCount) els.lobby.players.innerHTML='<li>Không có ai khác.</li>';
+    }
+    function showInvitation(from){
+      const box = document.createElement('div');
+      box.className='invitation';
+      box.id = `inv-from-${from}`;
+      box.innerHTML = `<span>${sanitize(from)} mời bạn thách đấu.</span>`;
+      const act = document.createElement('div');
+      const accept = document.createElement('button');
+      accept.className='btn-action';
+      accept.textContent='Chấp nhận';
+      accept.addEventListener('click',()=>{
+        ws?.send(JSON.stringify({type:'challenge_accept', opponent_name:from}));
+        els.lobby.invites.innerHTML='';
+      });
+      const decline = document.createElement('button');
+      decline.className='btn-secondary';
+      decline.textContent='Từ chối';
+      decline.addEventListener('click',()=>{
+        ws?.send(JSON.stringify({type:'challenge_decline', opponent_name:from}));
+        box.remove();
+      });
+      act.append(accept, decline);
+      box.appendChild(act);
+      els.lobby.invites.appendChild(box);
+    }
 
-  function leaveGame() {
-    if (ws) ws.send(JSON.stringify({ type: "leave_game" }));
-    document.getElementById("gameView").style.display = "none";
-    document.getElementById("lobbyView").style.display = "block";
-    modalOverlay.style.display = "none";
-    myColor = null; turn = "red"; selected = null;
-    log("Đã quay về sảnh.");
-  }
+    /*** Navigation ***/
+    function leaveGame(){
+      ws?.send(JSON.stringify({type:'leave_game'}));
+      showView('lobby');
+      els.modal.overlay.style.display = 'none';
+      myColor=null; turn='red'; selected=null; log('Đã quay về sảnh.');
+    }
 
-  function log(t) {
-    const el = document.getElementById("log");
-    const newEntry = document.createElement("div");
-    newEntry.className = "log-entry";
-    newEntry.innerHTML = `<span>[${new Date().toLocaleTimeString()}]</span> ${t}`;
-    el.prepend(newEntry);
-    while (el.childElementCount > 100) el.lastChild.remove();
-  }
+    /*** WebSocket ***/
+    function setupWS(){
+      const protocol = location.protocol==='https:'?'wss:':'ws:';
+      const url = `${protocol}//${location.host}/ws`;
+      ws = new WebSocket(url);
 
-  function sendChat() {
-    const text = chatInput.value;
-    if (text.trim() === "" || !ws) return;
-    ws.send(JSON.stringify({ type: "chat_message", text }));
-    chatInput.value = "";
-  }
+      ws.onopen = () => {
+        els.body.classList.add('in-lobby');
+        ws.send(JSON.stringify({ type:'join_lobby', player:playerName }));
+        showView('lobby');
+        els.lobby.name.textContent = playerName;
+      };
 
-  function addChatMessage(from, text) {
-    const newEntry = document.createElement("div");
-    newEntry.className = "chat-message";
-    const safeFrom = from.replace(/</g, "&lt;").replace(/>/g, "&gt;");
-    const safeText = text.replace(/</g, "&lt;").replace(/>/g, "&gt;");
-    newEntry.innerHTML = `<b>${safeFrom}:</b> ${safeText}`;
-    chatLogDiv.appendChild(newEntry);
-    chatLogDiv.scrollTop = chatLogDiv.scrollHeight;
-  }
-</script>
+      ws.onmessage = (e) => {
+        let msg; try{ msg = JSON.parse(e.data); }catch{ return; }
+        switch(msg.type){
+          case 'lobby_update':
+            renderLobby(msg.players); break;
+          case 'challenge_received':
+            showInvitation(msg.from_player); break;
+          case 'game_start':
+            myColor = msg.color;
+            showView('game');
+            els.modal.overlay.style.display='none';
+            els.game.board.classList.toggle('board--flipped', myColor==='black');
+            log(`Trận đấu bắt đầu. Bạn là ${myColor}. Đối thủ: ${msg.opponent}`);
+            els.game.chatLog.innerHTML='';
+            addChatMessage('Hệ thống','Chat đã được kết nối. Chúc bạn chơi vui vẻ!');
+            break;
+          case 'new_chat_message':
+            addChatMessage(msg.from, msg.text); break;
+          case 'state':
+            updateBoard(msg.state.board);
+            turn = msg.turn; clocks = msg.clocks; updateTurn(); updateClocks();
+            break;
+          case 'clock_update':
+            clocks = msg.clocks; updateClocks(); break;
+          case 'game_over':
+            showGameOver(msg.winner_name, msg.reason); break;
+          case 'rematch_offered':
+            log(`📣 Đối thủ ${msg.from} muốn chơi lại. Bấm "Chơi lại" để đồng ý.`); break;
+          case 'system':
+            log(`ℹ️ ${msg.text}`); break;
+          case 'error':
+            log(`⚠️ Lỗi: ${msg.reason}`); break;
+        }
+      };
+
+      ws.onclose = () => {
+        els.body.classList.remove('in-lobby');
+        log('Mất kết nối. Hãy kết nối lại.');
+        showView('login');
+      };
+    }
+
+    /*** Event bindings ***/
+    function bindEvents(){
+      els.login.connect.addEventListener('click', () => {
+        const name = els.login.name.value.trim();
+        if(!name){ alert('Vui lòng nhập tên'); return; }
+        playerName = name.slice(0,24);
+        setupWS();
+      });
+      els.login.name.addEventListener('keydown', (e)=>{
+        if(e.key==='Enter'){ e.preventDefault(); els.login.connect.click(); }
+      });
+
+      els.lobby.bot.addEventListener('click', () => {
+        if(ws){ ws.send(JSON.stringify({ type:'challenge', target_player:'Bot' })); log('Đã gửi lời mời thách đấu Bot...'); }
+      });
+
+      els.game.sendChat.addEventListener('click', sendChat);
+      els.game.chatInput.addEventListener('keydown', (e)=>{
+        if(e.key==='Enter' && !e.shiftKey){ e.preventDefault(); sendChat(); }
+      });
+
+      els.game.back.addEventListener('click', leaveGame);
+      els.modal.back.addEventListener('click', leaveGame);
+      els.modal.rematch.addEventListener('click', offerRematch);
+    }
+
+    /*** Init ***/
+    createBoard();
+    bindEvents();
+    showView('login');
+  })();
+  </script>
 </body>
 </html>

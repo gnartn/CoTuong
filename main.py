@@ -1,4 +1,4 @@
-# main.py (final with absolute paths, client_web.html outside /static)
+# main.py (Đã sửa lỗi không đánh được cờ)
 from __future__ import annotations
 
 import asyncio
@@ -792,8 +792,8 @@ async def websocket_endpoint(websocket: WebSocket):
                     continue
 
                 is_check_alert = False
-                is_self_check_alert = False
-                is_flying_general_alert = False
+                # is_self_check_alert = False # <- KHÔNG CẦN NỮA
+                # is_flying_general_alert = False # <- KHÔNG CẦN NỮA
                 bot_color_to_move: Optional[str] = None
 
                 async with lock:
@@ -810,51 +810,64 @@ async def websocket_endpoint(websocket: WebSocket):
                     if g.game_id is None:
                         await safe_send(websocket, {"type": "error", "reason": "Game đã kết thúc"})
                         continue
-
+                    
+                    # (1) Kiểm tra luật đi cơ bản (quân cờ có đi được như vậy không)
                     ok, why = is_valid_move(g.state["board"], move, player_color)
                     if not ok:
                         await safe_send(websocket, {"type": "error", "reason": why})
                         continue
 
+                    # (2) Đi thử trên bàn cờ tạm
+                    # (Hàm _apply_move_on_copy đã có sẵn ở trên, dùng cho Bot)
+                    temp_board = _apply_move_on_copy(g.state["board"], move)
+
+                    # (3) Kiểm tra các điều kiện không hợp lệ (tự chiếu, lộ tướng) TRÊN BÀN CỜ TẠM
+                    if is_flying_general(temp_board):
+                        await safe_send(websocket, {"type": "error", "reason": "Nước đi không hợp lệ: Lộ tướng!"})
+                        continue
+
+                    if is_king_in_check(temp_board, player_color):
+                        await safe_send(websocket, {"type": "error", "reason": "Nước đi không hợp lệ: Tự chiếu tướng!"})
+                        continue
+
+                    # (4) Nước đi đã hợp lệ -> Áp dụng vào bàn cờ thật
                     fx, fy = move["from"]["x"], move["from"]["y"]
                     piece = g.state["board"][fy][fx]
-                    apply_move(g.state, move)
+                    apply_move(g.state, move) # <--- ÁP DỤNG THẬT
 
-                    if is_flying_general(g.state["board"]):
-                        is_flying_general_alert = True
-                    if is_king_in_check(g.state["board"], player_color):
-                        is_self_check_alert = True
-
+                    # (5) Kiểm tra xem có chiếu tướng đối thủ không
                     opp = get_opponent_color(player_color)
                     if is_king_in_check(g.state["board"], opp):
-                        is_check_alert = True
+                        is_check_alert = True # <--- Đặt cờ để gửi cảnh báo
 
+                    # (6) Ghi lại nước đi và đổi lượt
                     idx = g.move_count + 1
                     add_move_record(g.game_id, idx, fx, fy, move["to"]["x"], move["to"]["y"], piece)
                     g.move_count = idx
                     g.turn = opp
 
+                    # (7) Kiểm tra tướng bị ăn (game over)
                     red_alive = find_king(g.state["board"], 'red')[0] != -1
                     black_alive = find_king(g.state["board"], 'black')[0] != -1
                     if not red_alive or not black_alive:
                         await send_game_over(room_id, 'red' if red_alive else 'black', "Tướng đã bị ăn")
                         continue
 
-                    # bot sau lượt người
+                    # (8) Kích hoạt Bot nếu đến lượt
                     names = list(g.player_colors.keys())
                     opponent_name = names[1] if names and names[0] == player else names[0] if names else None
                     if opponent_name == "Bot" and g.game_id and g.turn == g.player_colors["Bot"]:
                         bot_color_to_move = g.turn
 
+                # Gửi trạng thái bàn cờ mới cho cả 2 người chơi
                 await send_state(room_id)
 
-                if is_flying_general_alert:
-                    await safe_send(websocket, {"type": "system", "text": "⚠️ CẢNH BÁO: Lộ tướng!"})
-                if is_self_check_alert:
-                    await safe_send(websocket, {"type": "system", "text": "⚠️ CẢNH BÁO: Tướng của bạn đang bị chiếu!"})
+                # Gửi thông báo chiếu tướng (nếu có)
+                # Các cảnh báo về "lộ tướng" và "tự chiếu" đã được xử lý bằng lỗi ở trên
                 if is_check_alert:
                     await broadcast_to_room(room_id, {"type": "system", "text": "CHIẾU TƯỚNG!"})
 
+                # Chạy nước đi của Bot (nếu có)
                 if bot_color_to_move:
                     asyncio.create_task(run_bot_move(room_id, bot_color_to_move))
                 continue
